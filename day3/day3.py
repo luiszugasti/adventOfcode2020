@@ -2,6 +2,7 @@
 from typing import List
 
 from day2.day2 import open_file
+from functools import reduce
 
 
 # each line is 31 chars long
@@ -46,7 +47,7 @@ def main():
     answer = navigate_trees(puzzle_input, 1)
 
     print("values before multiplying: {}, {}, {}, {}, {}".format(answer[0], answer[1], answer[2], answer[3], answer[4]))
-    print("answer: {}".format(answer))
+    print("answer: {}".format(reduce((lambda x, y: x * y), answer)))
 
 
 if __name__ == '__main__':
