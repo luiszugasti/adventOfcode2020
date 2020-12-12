@@ -77,7 +77,7 @@ def is_valid_passport(available_fields):
     return True
 
 
-def passport_lines_to_dict(lines) -> dict:
+def input_lines_to_dict(lines) -> dict:
     """Accept lines from passport batch file and create a dictionary"""
     passport = {}
     for line in lines:
@@ -94,7 +94,7 @@ def count_valid_passports(lines: List[str]):
     count = 0
     for line in lines:
         if is_newline(line):
-            current_passport = passport_lines_to_dict(running_list)
+            current_passport = input_lines_to_dict(running_list)
             if is_valid_passport(current_passport):
                 count = count + 1
             running_list = []
