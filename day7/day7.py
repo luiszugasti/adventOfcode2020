@@ -16,19 +16,25 @@ def traverse_bags(bags: Dict[str, Dict[str, int]], bags_to_search: Set[str], goa
             pass
 
 
-def process_rule(rule: str) -> Tuple[str, Dict[str, int]]:
+def process_rule(rule: str):  # -> Tuple[str, Dict[str, int]]
     """ for each rule, returns a (bag_color, internal_bags) representation."""
-    [this_color, *bag_strings] = rule[:-6].split(" bags contain ")
+    # I couldn't find anything in Python that would be extremely complicated without using lookaheads it seems,
+    # so I am employing a simple pipeline of splitting.
+    temp_strings = (re.compile(" bag[s]*\.").split(rule))[0]
+    temp_strings = re.compile(" bag[s]*, ").split(temp_strings)
+    [bag_color, first_bag_string] = re.compile(" bags contain ").split(temp_strings[0])
+
+    bag_strings = [first_bag_string] + temp_strings[1:]
+
     if bag_strings[0] == "no other":
-        return this_color, {}
-    bag_strings = re.compile(" bag[s], ").split(bag_strings[0])
+        return bag_color, {}
 
     bags = {}
     for bag in bag_strings:
         amount = int(bag[0])
         color = bag[2:]
         bags[color] = amount
-    return this_color, bags
+    return bag_color, bags
 
 
 def process_all_rules(rules: List[str]) -> Tuple[Dict[str, Dict[str, int]], set]:
@@ -43,19 +49,28 @@ def process_all_rules(rules: List[str]) -> Tuple[Dict[str, Dict[str, int]], set]
 
 
 def find_all_bag_colors(rules: List[str], bag_color: str) -> int:
-    rules, unique_colors = process_all_rules(rules)
+    rules, unseen_colors = process_all_rules(rules)
     current_colors = set()
-    possible_bags = 0
 
-    for bag_color in rules.keys():
-        # traverse the dictionary one level deep.
-        # if we find our bag, add this to our current_colors set. Include the amount.
+    for rule_bag in rules.keys():
+        if bag_color in rules[rule_bag].keys():
+            current_colors.add(rule_bag)
+            unseen_colors.remove(rule_bag)
 
-        # loop until we have no more bags to search (make sure to not go into cycles - more on this
-        # later).
+    while len(current_colors) > 0:
+        new_colors = set()
+        remove_colors = set()
+        for rule_bag in unseen_colors:
+            for follow_on_bag in current_colors:
+                if follow_on_bag in rules[rule_bag].keys():
+                    new_colors.add(rule_bag)
+                    remove_colors.add(rule_bag)
 
-        # return the amount of bags that can fit our gold bag.
-        t = 9
+        current_colors = new_colors
+        for color in remove_colors:
+            unseen_colors.remove(color)
+
+    return len(rules) - len(unseen_colors)
 
 
 if __name__ == '__main__':
