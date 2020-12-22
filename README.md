@@ -41,7 +41,11 @@ Binary splitting - as suggested by problem statement.
 
 What should have been a straightforward dictionary problem.
 
-### Day 8, and beyond....
+### Day 8 - python
+
+List iteration, and a nice refactoring.
+
+### Day 9, and beyond....
 
 ## Additional comments
 
