@@ -51,27 +51,53 @@ def process_all_rules(rules: List[str]) -> Tuple[Dict[str, Dict[str, int]], set]
 def find_num_internal_bags(rules: List[str], bag_color: str) -> int:
     """ TODO: refactor"""
     rules, unseen_colors = process_all_rules(rules)
-    current_colors = set()
 
-    for rule_bag in rules.keys():
-        if bag_color in rules[rule_bag].keys():
-            current_colors.add(rule_bag)
-            unseen_colors.remove(rule_bag)
+    # find first (and only) occurrence of shiny gold bag
+    # get the bags that it contains, and build a tree
+    # once we have the bags it contains, repeat the process.
+    # if we get a bag that has no bags inside it, then put no entry inside
+    # do until we have no more bags to traverse.
 
-    while len(current_colors) > 0:
-        new_colors = set()
-        remove_colors = set()
-        for rule_bag in unseen_colors:
-            for follow_on_bag in current_colors:
-                if follow_on_bag in rules[rule_bag].keys():
-                    new_colors.add(rule_bag)
-                    remove_colors.add(rule_bag)
+    # Then, in reverse fashion, return amount. For simplicity, traverse the tree we have created.
+    # each node will return its current amount * the amount of bags inside it.
+    # Leaf case: return only the amount of bags that it contains in the parent level
+    # Top level will accumulate. Remember not to add the value for the shiny gold bag.
 
-        current_colors = new_colors
-        for color in remove_colors:
-            unseen_colors.remove(color)
+    # Create the tree of internal bags
+    current_pointers = []
+    tree = {}
+    for entry in rules[bag_color].keys():
+        tree[entry] = {}
+        tree[entry]["amount"] = rules[bag_color][entry]
+        tree[entry]["next"] = {}
+        current_pointers.append((entry, tree[entry]))
 
-    return len(rules) - len(unseen_colors)
+    while len(current_pointers) > 0:
+        new_bags = []
+        for bag_color, tree_pointer in current_pointers:
+            for entry in rules[bag_color].keys():
+                inner = {}
+                inner[entry] = {}
+                inner[entry]["amount"] = rules[bag_color][entry]
+                inner[entry]["next"] = {}
+                new_bags.append((entry, inner[entry]))
+                tree_pointer["next"] = {**inner, **tree_pointer["next"]}
+
+        current_pointers = new_bags
+
+    # Traverse the tree of internal parts and aggregate the results.
+    def _traverse_tree(node) -> int:
+        if not node["next"]:
+            return node["amount"]
+        value = 0
+        for bag in node["next"].keys():
+            value = value + _traverse_tree(node["next"][bag])
+        return value * node["amount"] + node["amount"]
+
+    answer = 0
+    for node in tree.keys():
+        answer = answer + _traverse_tree(tree[node])
+    return answer
 
 
 def find_all_bag_colors(rules: List[str], bag_color: str) -> int:
@@ -100,7 +126,7 @@ def find_all_bag_colors(rules: List[str], bag_color: str) -> int:
 
 
 if __name__ == '__main__':
-    puzzle_input = open_file("day7_sample_input.txt")
+    puzzle_input = open_file("day7_input.txt")
     answer = find_num_internal_bags(puzzle_input, "shiny gold")
 
     print("answer: {}".format(answer))
