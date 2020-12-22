@@ -25,7 +25,23 @@ I used a map for this one.
 
 Modulo arithmetic.
 
-### Day 4, and beyond....
+### Day 4 - python
+
+Tried an enumeration of sorts and lambdas.
+
+### Day 5 - python
+
+Binary splitting - as suggested by problem statement.
+
+### Day 6 - python
+
+(Ab)using Python Sets.
+
+### Day 7 - python
+
+What should have been a straightforward dictionary problem.
+
+### Day 8, and beyond....
 
 ## Additional comments
 

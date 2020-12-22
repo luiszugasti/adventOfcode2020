@@ -28,7 +28,6 @@ def find_my_seat(tickets: List[str]) -> int:
     ids = [seat_id(ticket) for ticket in tickets]
     list.sort(ids)
     min = ids[0]
-    max = ids[len(ids) - 1]
 
     # could also do without some complexity and determine the difference of sums
     # of a list that has my ticket id and one without my id
